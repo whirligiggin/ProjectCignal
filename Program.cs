@@ -1,8 +1,14 @@
+
+using ProjectCignal.Services;
+using ProjectCignal.Models;
+
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<ProjectCignal.Services.TripEstimatorService>();
+
 
 var app = builder.Build();
 
@@ -21,7 +27,44 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
 app.MapRazorPages()
-   .WithStaticAssets();
+    .WithStaticAssets();
+
+app.MapPost("/api/trip-estimates",(TripEstimateRequest request, TripEstimatorService tripEstimatorService) =>
+{
+    if (string.IsNullOrWhiteSpace(request.SegmentName)) {
+        return Results.BadRequest(new { error = "SegmentName is required." });
+    }
+    if (request.DistanceMiles <= 0) {
+        return Results.BadRequest(new { error = "DistanceMiles must be a positive number." });
+    }
+    if (request.PaddlingSpeedMph <= 0) {
+        return Results.BadRequest(new { error = "PaddlingSpeedMph must be a positive number." });
+    }
+try
+    {
+        var estimate = tripEstimatorService.Estimate(
+            request.SegmentName,
+            request.DistanceMiles,
+            request.PaddlingSpeedMph,
+            request.RiverCurrentMph,
+            request.LaunchTime);
+
+        var response = new TripEstimateResponse
+        {
+            SegmentName = estimate.SegmentName,
+            EstimatedDurationHours = estimate.EstimatedDuration.TotalHours,
+            EstimatedDurationText = tripEstimatorService.FormatDuration(estimate.EstimatedDuration),
+            EstimatedFinishTime = estimate.EstimatedFinishTime,
+            Assumptions = estimate.Assumptions
+        };
+        return Results.Ok(response);
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.BadRequest(new { error = ex.Message });
+    }  
+});
 
 app.Run();

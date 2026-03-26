@@ -33,6 +33,12 @@ public class TripEstimatorService
             Assumptions = "This first slice models water movement primarily through river current."
         };
     }
+
+    public string FormatDuration(TimeSpan duration)
+    {
+        return $"{(int)duration.TotalHours} hr {duration.Minutes} min";
+    }
+    
     public List<RiverSegment> GetPresetSegments()
 {
     return new List<RiverSegment>
@@ -40,8 +46,8 @@ public class TripEstimatorService
         new RiverSegment { Name = "Neuse - Anderson Point to Poole Road", DistanceMiles = 7.0, DefaultRiverCurrentMph = 1.5 },
         new RiverSegment { Name = "Cape Fear - Lillington to Erwin", DistanceMiles = 10.0, DefaultRiverCurrentMph = 2.0 },
         new RiverSegment { Name = "Lumber - Boardman to Fair Bluff", DistanceMiles = 12.0, DefaultRiverCurrentMph = 1.2 }
-    };
-}
+        };
+    }
 }
 
 public class TripEstimateResult
@@ -57,6 +63,5 @@ public class RiverSegment
     public string Name { get; set; } = string.Empty;
     public double DistanceMiles { get; set; }
     public double DefaultRiverCurrentMph { get; set; }  // Default current speed, can be adjusted as needed
-
-
 }
+

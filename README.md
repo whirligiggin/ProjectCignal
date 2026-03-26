@@ -59,6 +59,35 @@ These act as starting points and can be adjusted by the user.
 - Other local water conditions (e.g., wind, tidal influence, obstructions) may affect actual trip time
 - Estimates are directional, not guaranteed
 
+## API
+
+ProjectCignal exposes a simple HTTP API for trip estimation.
+
+### Endpoint
+`POST /api/trip-estimates`
+
+### Example request
+```json
+{
+  "segmentName": "Neuse - Anderson Point to Poole Road",
+  "distanceMiles": 7.0,
+  "paddlingSpeedMph": 2.5,
+  "riverCurrentMph": 1.5,
+  "launchTime": "2026-03-25T09:00:00"
+}
+```
+
+### Example response
+```json
+{
+  "segmentName": "Neuse - Anderson Point to Poole Road",
+  "estimatedDurationHours": 1.75,
+  "estimatedDurationText": "1 hr 45 min",
+  "estimatedFinishTime": "2026-03-25T10:45:00",
+  "assumptions": "This first slice models water movement primarily through river current."
+}
+```
+
 ## Tech stack
 - ASP.NET Core (Razor Pages)
 - C#
@@ -77,6 +106,7 @@ Services/
 - separation of UI and business logic
 - dependency injection in .NET
 - ability to ramp into a new language/environment
+- exposing application logic through an API
 - domain modeling from a real-world use case
 
 ## Future improvements
